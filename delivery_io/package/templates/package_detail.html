@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow mb-3">
+    <div class="row g-0">
+        <div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-3">
+            {% if object.photo_field %}
+                <img src="{{ object.photo_field.url }}" class="img-fluid rounded shadow-sm" alt="Foto do Pacote">
+            {% else %}
+                <div class="text-muted">Sem foto</div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h2 class="card-title">{{ object.owner_name }}</h2>
+                <h4 class="text-muted mb-4">Apto: {{ object.ap_number }}</h4>
+
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item"><strong>Recebido por:</strong> {{ object.user_deliver.username }}</li>
+                    <li class="list-group-item"><strong>Horário:</strong> {{ object.created_at|date:"H:i" }}</li>
+                    <li class="list-group-item"><strong>Tipo:</strong> {{ object.package_type }}</li>
+                    <li class="list-group-item"><strong>Prédio:</strong> {{ object.building }}</li>
+                </ul>
+
+                <a href="{% url 'packages_list' %}" class="btn btn-outline-primary">Voltar para a Lista</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

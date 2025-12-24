@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6"> <div class="card shadow-lg border-0 rounded-4">
+
+            <div class="card-header p-4 text-center" style="background-color: var(--primary-purple); border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <h4 class="m-0 text-white fw-bold">
+                    <i class="bi bi-box-seam-fill me-2"></i> Registrar Chegada
+                </h4>
+                <p class="text-white-50 mb-0 small">Preencha os dados da encomenda recebida</p>
+            </div>
+
+            <div class="card-body p-5 bg-white">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label text-purple fw-bold small text-uppercase">
+                            Nome do Morador
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light border-end-0 text-purple">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            {{ form.owner_name }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label text-purple fw-bold small text-uppercase">
+                                Apartamento
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-end-0 text-purple">
+                                    <i class="bi bi-door-open-fill"></i>
+                                </span>
+                                {{ form.ap_number }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-purple fw-bold small text-uppercase">
+                                Tipo de Pacote
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-end-0 text-purple">
+                                    <i class="bi bi-tags-fill"></i>
+                                </span>
+                                {{ form.package_type }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label text-orange fw-bold small text-uppercase">
+                            <i class="bi bi-camera-fill me-1"></i> Foto do Pacote (Obrigatória)
+                        </label>
+                        <div class="p-4 bg-light rounded-3 border border-2 border-light text-center">
+                            {{ form.photo_field }}
+                            <div class="form-text mt-2 text-muted">
+                                <i class="bi bi-info-circle"></i> Tire uma foto legível da etiqueta.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-purple btn-lg py-3 fw-bold shadow-sm">
+                            <i class="bi bi-check-circle-fill me-2"></i> Confirmar Recebimento
+                        </button>
+
+                        <a href="{% url 'packages_list' %}" class="btn btn-outline-secondary border-0">
+                            Cancelar e Voltar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Força os inputs a ocuparem o espaço certo e terem bordas suaves */
+    .input-group > input,
+    .input-group > select,
+    .input-group > .form-control {
+        border-left: none; /* Remove a borda esquerda para colar no ícone */
+        background-color: #fcfcfc;
+    }
+    .input-group > input:focus,
+    .input-group > select:focus {
+        background-color: #fff;
+        box-shadow: none;
+        border-color: var(--primary-purple);
+    }
+    /* Estilo para o input de arquivo ficar mais apresentável */
+    input[type=file] {
+        width: 100%;
+        margin-left: 0;
+    }
+</style>
+{% endblock %}

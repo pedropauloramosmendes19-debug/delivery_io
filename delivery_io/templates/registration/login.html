@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-5 col-lg-4">
+
+        <div class="card border-0 shadow-lg text-white" style="background-color: #1a1a1a; border-radius: 1rem;">
+            <div class="card-body p-5">
+
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-white">
+                        <i class="bi bi-box-seam-fill text-purple me-2"></i>Delivery IO
+                    </h3>
+                    <p class="text-white-50 small">Acesse o sistema do seu condomínio</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small text-uppercase fw-bold">Usuário</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-secondary">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            <input type="text" name="username" class="form-control bg-dark text-white border-secondary" placeholder="Seu usuário" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small text-uppercase fw-bold">Senha</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-secondary">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <input type="password" name="password" class="form-control bg-dark text-white border-secondary" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-purple btn-lg py-2 fw-bold shadow">
+                            Entrar no Sistema
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center pt-4 border-top border-secondary">
+                    <p class="text-white-50 small mb-2">É sua primeira vez aqui?</p>
+                    <a href="{% url 'create_user' %}" class="btn btn-outline-light w-100 fw-bold hover-orange">
+                        <i class="bi bi-person-plus-fill me-2"></i> Criar minha conta
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .hover-orange:hover {
+        background-color: var(--accent-orange) !important;
+        border-color: var(--accent-orange) !important;
+        color: white !important;
+    }
+    /* Ajuste para inputs escuros ficarem bonitos */
+    .form-control:focus {
+        background-color: #2b2b2b;
+        color: white;
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 0.25rem rgba(90, 50, 163, 0.25);
+    }
+</style>
+{% endblock %}
