@@ -33,7 +33,7 @@ export default function RegisterScreen() {
     React.useEffect(() => {
         const fetchBuildings = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}api/buildings/`);
+                const response = await axios.get(`${BASE_URL}/api/buildings/`);
                 setBuildings(response.data);
             } catch (error) {
                 console.error("Erro ao buscar prédios:", error);
@@ -51,7 +51,7 @@ export default function RegisterScreen() {
 
         setLoading(true);
         try {
-            await axios.post(`${BASE_URL}api/register/`, {
+            await axios.post(`${BASE_URL}/api/register/`, {
                 username,
                 email,
                 password,
