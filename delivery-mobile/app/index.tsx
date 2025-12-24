@@ -19,7 +19,7 @@ interface Package {
   photo_field?: string | null;
 }
 
-const BASE_URL = 'https://celinda-ticklish-anette.ngrok-free.dev';
+const BASE_URL = 'https://deliveryjflio.up.railway.app';
 
 export default function App() {
   const { token, signOut, user } = useAuth();
