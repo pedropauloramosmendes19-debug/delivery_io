@@ -63,6 +63,7 @@ export default function RegisterScreen() {
             ]);
         } catch (error: any) {
             console.error(error);
+            console.log("URL QUE ESTOU TENTANDO:", `${BASE_URL}/api/register/`);
             const msg = error.response?.data?.username ? "Usuário já existe" : "Erro ao criar conta";
             Alert.alert("Erro", msg);
         } finally {
