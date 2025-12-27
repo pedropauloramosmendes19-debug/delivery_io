@@ -183,7 +183,16 @@ CSRF_TRUSTED_ORIGINS = [
                         ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Configuração moderna de Armazenamento (Django 4.2+)
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Configuração para pegar as chaves do Railway
 CLOUDINARY_STORAGE = {
@@ -192,8 +201,6 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-# Avisa o Django para salvar fotos e arquivos no Cloudinary
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # settings.py
 
