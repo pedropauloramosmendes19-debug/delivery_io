@@ -99,9 +99,14 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'packages_list' %}">Encomendas</a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reports' %}">Relatórios</a>
+                    </li>
+                    {% endif %}
                 </ul>
 
                 {% if user.is_authenticated %}

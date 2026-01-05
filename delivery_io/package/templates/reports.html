@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="text-purple fw-bold mb-3"><i class="bi bi-bar-chart-line"></i> Relatórios Gerenciais</h2>
+        <p class="text-muted">Acompanhe as métricas detalhadas do seu condomínio.</p>
+    </div>
+</div>
+
+<!-- Cards de Resumo -->
+<div class="row mb-5">
+    <div class="col-md-6 mb-3">
+        <div class="card h-100 border-start border-4 border-warning">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-clock-history fs-1 text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Horário de Pico</h6>
+                        <h3 class="fw-bold mb-0">{{ busiest_hour }}</h3>
+                        <small class="text-muted">{{ busiest_hour_count }} entregas registradas</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card h-100 border-start border-4 border-info">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-box-seam fs-1 text-info"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Tipo Mais Comum</h6>
+                        <h3 class="fw-bold mb-0">{{ top_type }}</h3>
+                        <small class="text-muted">{{ top_type_count }} registros</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Meses -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-purple"><i class="bi bi-calendar-check"></i> Histórico Mensal de Entregas</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Mês/Ano</th>
+                                <th class="text-center">Total de Entregas</th>
+                                <th class="text-end pe-4">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in monthly_stats %}
+                            <tr style="cursor: pointer;"
+                                onclick="window.location='{% url 'packages_month' %}?month={{ item.month|date:'n' }}&year={{ item.month|date:'Y' }}'">
+                                <td class="ps-4 fw-bold text-purple">{{ item.month|date:"F Y"|title }}</td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-primary fs-6">{{ item.total }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'packages_month' %}?month={{ item.month|date:'n' }}&year={{ item.month|date:'Y' }}"
+                                        class="btn btn-sm btn-outline-secondary">
+                                        Ver Dashboard <i class="bi bi-graph-up"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    Nenhuma entrega registrada ainda.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -10,8 +10,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     building_id = serializers.PrimaryKeyRelatedField(
         queryset=Building.objects.all(), 
         source='building',
-        required=False,
-        allow_null=True
+        required=True,
+        allow_null=False
     )
 
     class Meta:

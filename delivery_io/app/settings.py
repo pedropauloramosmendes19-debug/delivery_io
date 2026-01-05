@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-lsgpr@b-_6be8mr2%z5$h*9rv3c-*d@(xf-f#&t53b(!-^beu#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -150,6 +150,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = 'packages_list'
 
 LOGOUT_REDIRECT_URL = 'login'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 REST_FRAMEWORK = {

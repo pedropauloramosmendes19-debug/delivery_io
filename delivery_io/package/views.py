@@ -53,6 +53,12 @@ class PackageListView(LoginRequiredMixin, ListView):
         if ap_number:
             query =  query.filter(ap_number__icontains=ap_number)
 
+        # Filtro de Mês e Ano (vindo da página de Relatórios)
+        month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
+        if month and year:
+            query = query.filter(created_at__month=month, created_at__year=year)
+
         return query.order_by('-created_at')
 
     def get_context_data(self, **kwargs):
