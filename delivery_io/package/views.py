@@ -6,6 +6,8 @@ from .models import Package
 from .forms import PackageForms
 from type.models import Type
 from rest_framework import generics, permissions
+from rest_framework.pagination import PageNumberPagination
+
 from .serializers import PackageSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -76,9 +78,15 @@ class PackageListView(LoginRequiredMixin, ListView):
         return context
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class PackageListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = PackageSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         print(self.request.META.get('HTTP_AUTHORIZATION'))

@@ -50,8 +50,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['line_values'] = list(hours_map.values())
 
         # --- NOVO: RANKING DE RECEPCIONISTAS (Para o Supervisor) ---
-        # Agrupa pelo nome do usuário e conta quantos pacotes cada um fez
-        team_performance = qs.values('user_deliver__username').annotate(total=Count('id')).order_by('-total')
+        # --- NOVO: RANKING DE RECEPCIONISTAS (Para o Supervisor) ---
+        # Agrupa pelo nome do usuário e conta quantos pacotes cada um fez HOJE
+        team_performance = qs.filter(created_at__date=today).values('user_deliver__username').annotate(total=Count('id')).order_by('-total')
         context['team_stats'] = team_performance
 
         return context
@@ -142,6 +143,16 @@ class MonthlyDashboardView(LoginRequiredMixin, TemplateView):
 
         context['line_labels'] = [f"{h}h" for h in hours_map.keys()]
         context['line_values'] = list(hours_map.values())
+
+        # --- TIPO MAIS FREQUENTE ---
+        type_data = qs.values('package_type__type').annotate(total=Count('id')).order_by('-total')
+        if type_data:
+            top_type = type_data[0]
+            context['top_type'] = top_type['package_type__type'] or "Sem Tipo"
+            context['top_type_count'] = top_type['total']
+        else:
+            context['top_type'] = "-"
+            context['top_type_count'] = 0
 
         # --- RANKING DE RECEPCIONISTAS ---
         team_performance = qs.values('user_deliver__username').annotate(total=Count('id')).order_by('-total')

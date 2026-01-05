@@ -16,7 +16,7 @@
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card border-0 shadow-sm p-3 h-100 border-start border-4 border-primary">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card border-0 shadow-sm p-3 h-100 border-start border-4"
             style="border-color: var(--accent-orange) !important;">
             <div class="d-flex justify-content-between align-items-center">
@@ -39,6 +39,20 @@
                 </div>
                 <div class="bg-light text-orange rounded-circle p-3">
                     <i class="bi bi-calculator fs-2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm p-3 h-100 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-uppercase text-muted small fw-bold">Tipo Mais Frequente</span>
+                    <h2 class="display-6 fw-bold text-success">{{ top_type }}</h2>
+                    <small class="text-muted">{{ top_type_count }} entregas</small>
+                </div>
+                <div class="bg-light-success text-success rounded-circle p-3">
+                    <i class="bi bi-trophy fs-2"></i>
                 </div>
             </div>
         </div>

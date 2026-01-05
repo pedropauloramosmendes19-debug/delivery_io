@@ -12,6 +12,7 @@ interface Package {
   owner_name: string;
   ap_number: string;
   package_type: string;
+  package_type_name?: string;
   user_deliver: string;
   building: string;
   created_at: string;
@@ -21,23 +22,36 @@ interface Package {
 
 const BASE_URL = 'https://deliveryjflio.up.railway.app';
 
+/* ... (imports remain the same, ensuring we keep them if not replacing file completely) ... */
+/* OR better, I will replace the main body of the component to be safe */
 export default function App() {
   const { token, signOut, user } = useAuth();
   const router = useRouter();
 
   const [packages, setPackages] = useState<Package[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed initial state to false to control first load properly
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   useFocusEffect(
     useCallback(() => {
       if (token) {
-        fetchPackages();
+        // Reset and fetch initial data on focus
+        setPage(1);
+        setHasMore(true);
+        // We fetch explicitly here instead of depending on page effect to avoid race conditions on reset
+        fetchPackages(1, true);
       }
     }, [token])
   );
+
+  // We don't use useEffect on [page] to avoid double fetch on focus reset.
+  // We call fetchPackages manually when loading more.
 
   const filteredPackages = packages.filter(pkg => {
     const query = searchQuery.toLowerCase();
@@ -47,14 +61,15 @@ export default function App() {
     );
   });
 
-  const fetchPackages = async () => {
+  const fetchPackages = async (pageToFetch: number, reset = false) => {
+    if (loading) return; // Prevent double fetch
+
     try {
       setError(null);
-      // Se for pull-to-refresh, não mostra loading de tela inteira
-      if (!refreshing) setLoading(true);
+      if (pageToFetch === 1 && !refreshing) setLoading(true);
 
       const response = await axios.get(
-        `${BASE_URL}/api/packages/list/`,
+        `${BASE_URL}/api/packages/list/?page=${pageToFetch}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -64,32 +79,40 @@ export default function App() {
         }
       );
 
-      const rawData = response.data;
-      const dataList = rawData.results ? rawData.results : rawData;
+      const data = response.data;
+      // DRF pagination structure: { count: ..., next: ..., previous: ..., results: [...] }
+      const newPackages = data.results || [];
 
-      if (Array.isArray(dataList)) {
-        // Filtrar vazios e também por BUILDING do usuário
-        const validPackages = dataList.filter((pkg: any) => {
-          const isValid = pkg && pkg.id !== undefined;
+      // Filter by building client-side if needed (though API should handle it ideally)
+      // The previous code had client-side filtering. Let's keep it to be safe, 
+      // although API view filters mainly by building already.
+      const validPackages = newPackages.filter((pkg: any) => {
+        const isValid = pkg && pkg.id !== undefined;
+        const matchesBuilding = user?.building && pkg.building
+          ? pkg.building === user.building
+          : true;
+        return isValid && matchesBuilding;
+      });
 
-          // Lógica de Filtro por Prédio
-          // Se o pacote tem 'building' e o usuário tem 'building', devem ser iguais.
-          // Se o pacote não tiver field building, mostramos (ou escondemos, dependendo da regra de negócio).
-          // Aqui assumirei que só filtramos se ambos existirem.
-          const matchesBuilding = user?.building && pkg.building
-            ? pkg.building === user.building
-            : true; // Se não tiver info, mostra tudo (fallback)
-
-          return isValid && matchesBuilding;
-        });
+      if (reset) {
         setPackages(validPackages);
       } else {
-        setError("Formato de dados inválido.");
+        setPackages(prev => [...prev, ...validPackages]);
+      }
+
+      // Check if there are more pages
+      if (!data.next) {
+        setHasMore(false);
       }
 
     } catch (err: any) {
       console.error("Erro ao buscar pacotes:", err.message);
-      setError("Não foi possível carregar as encomendas.");
+      // If 404 on page > 1, it just means no more data
+      if (err.response && err.response.status === 404 && pageToFetch > 1) {
+        setHasMore(false);
+      } else {
+        setError("Não foi possível carregar as encomendas.");
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -98,7 +121,17 @@ export default function App() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchPackages();
+    setPage(1);
+    setHasMore(true);
+    fetchPackages(1, true); // Force reset
+  };
+
+  const loadMore = () => {
+    if (!loading && hasMore && !searchQuery) { // Don't paginate if searching locally
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchPackages(nextPage, false);
+    }
   };
 
   const renderItem = ({ item }: { item: Package }) => (
@@ -110,7 +143,8 @@ export default function App() {
         </View>
       </View>
 
-      <Text style={styles.typeText}>📦 {item.package_type}</Text>
+      {/* CHANGED: Use package_type_name if available, else fallback to package_type (id) */}
+      <Text style={styles.typeText}>📦 {item.package_type_name || item.package_type}</Text>
 
       <Text style={styles.dateText}>
         📅 {new Date(item.created_at).toLocaleDateString('pt-BR')} às {new Date(item.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -128,7 +162,16 @@ export default function App() {
     </View>
   );
 
-  if (loading && !refreshing) {
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator size="small" color="#5a32a3" />
+      </View>
+    );
+  };
+
+  if (Boolean(loading) && packages.length === 0 && !refreshing) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#5a32a3" />
@@ -168,29 +211,34 @@ export default function App() {
         />
       </View>
 
-      {error ? (
+      {error && packages.length === 0 ? (
         <View style={styles.center}>
           <Text style={{ color: 'red', textAlign: 'center', marginBottom: 20 }}>{error}</Text>
-          <TouchableOpacity onPress={fetchPackages} style={styles.retryButton}>
+          <TouchableOpacity onPress={() => fetchPackages(1, true)} style={styles.retryButton}>
             <Text style={styles.retryText}>Tentar Novamente ↻</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <FlatList
           data={filteredPackages}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={{ padding: 15, paddingBottom: 80 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#5a32a3']} />
           }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="cube-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>
-                {searchQuery ? "Nenhum resultado encontrado." : "Nenhuma encomenda registrada."}
-              </Text>
-            </View>
+            !loading ? (
+              <View style={styles.emptyContainer}>
+                <Ionicons name="cube-outline" size={64} color="#ccc" />
+                <Text style={styles.emptyText}>
+                  {searchQuery ? "Nenhum resultado encontrado." : "Nenhuma encomenda registrada."}
+                </Text>
+              </View>
+            ) : null
           }
         />
       )}
